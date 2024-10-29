@@ -13,7 +13,7 @@ The Mortgage Calculator Service is a Spring Boot application that provides an AP
 ## Prerequisites
 
 - Java 17 or higher
-- Maven 3.6.0 or higher
+- Gradle 8.10.2 or higher
 
 ## Configuration
 
