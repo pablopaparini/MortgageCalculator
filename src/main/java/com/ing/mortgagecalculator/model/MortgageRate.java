@@ -1,5 +1,5 @@
 package com.ing.mortgagecalculator.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-public record MortgageRate(int maturityPeriod, double interestRate, Timestamp lastUpdate) {}
+public record MortgageRate(int maturityPeriod, double interestRate, LocalDateTime lastUpdate) {}

@@ -50,7 +50,7 @@ class MortgageCalculatorControllerIntegrationTest {
     MortgageCheckRequest request =
         new MortgageCheckRequest(null, 30, BigDecimal.valueOf(240000), BigDecimal.valueOf(300000));
 
-    ResponseEntity<Map> response =
+    var response =
         restTemplate.postForEntity("/api/mortgage-check", request, Map.class);
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertNotNull(response.getBody());
@@ -75,10 +75,10 @@ class MortgageCalculatorControllerIntegrationTest {
       properties = {
         "mortgage.rates[0].maturityPeriod=30",
         "mortgage.rates[0].interestRate=0.0", // This will cause an ArithmeticException
-        "mortgage.rates[0].lastUpdate=2023-10-01 00:00:00",
+        "mortgage.rates[0].lastUpdate=2023-10-01T00:00:00",
         "mortgage.rates[1].maturityPeriod=15",
         "mortgage.rates[1].interestRate=2.8",
-        "mortgage.rates[1].lastUpdate=2023-10-01 00:00:00",
+        "mortgage.rates[1].lastUpdate=2023-10-01T00:00:00",
         "calculator.income.time.limit=4"
       })
   class ArithmeticExceptionTest {

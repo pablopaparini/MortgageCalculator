@@ -1,9 +1,7 @@
 package com.ing.mortgagecalculator.config;
 
-import java.sql.Timestamp;
-import java.util.List;
-
 import com.ing.mortgagecalculator.model.MortgageRate;
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 

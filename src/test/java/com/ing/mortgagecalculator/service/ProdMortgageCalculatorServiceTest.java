@@ -1,18 +1,18 @@
 package com.ing.mortgagecalculator.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.ing.mortgagecalculator.config.MortgageRateProperties;
+import com.ing.mortgagecalculator.exception.MaturityPeriodNotFoundException;
 import com.ing.mortgagecalculator.model.MortgageCheckRequest;
 import com.ing.mortgagecalculator.model.MortgageCheckResponse;
 import com.ing.mortgagecalculator.model.MortgageRate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ProdMortgageCalculatorServiceTest {
 
@@ -23,8 +23,8 @@ class ProdMortgageCalculatorServiceTest {
     MortgageRateProperties properties = new MortgageRateProperties();
     properties.setRates(
         List.of(
-            new MortgageRate(30, 3.5, Timestamp.valueOf("2023-10-01 00:00:00")),
-            new MortgageRate(15, 2.8, Timestamp.valueOf("2023-10-01 00:00:00"))));
+            new MortgageRate(30, 3.5, LocalDateTime.parse("2023-10-01T00:00:00")),
+            new MortgageRate(15, 2.8, LocalDateTime.parse("2023-10-01T00:00:00"))));
     service = new ProdMortgageCalculatorService(properties);
     ReflectionTestUtils.setField(service, "incomeTimeLimit", 4);
   }
@@ -54,10 +54,8 @@ class ProdMortgageCalculatorServiceTest {
             new BigDecimal("300000"));
     Exception exception =
         assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-              service.checkMortgage(request);
-            });
+            MaturityPeriodNotFoundException.class,
+            () -> service.checkMortgage(request));
     assertEquals("Interest rate for the given maturity period not found", exception.getMessage());
   }
 
@@ -65,41 +63,36 @@ class ProdMortgageCalculatorServiceTest {
   void testCheckMortgageDenominatorZero() {
     MortgageRateProperties properties = new MortgageRateProperties();
     properties.setRates(
-            List.of(
-                    new MortgageRate(30, 0.0, Timestamp.valueOf("2023-10-01 00:00:00")),
-                    new MortgageRate(15, 2.8, Timestamp.valueOf("2023-10-01 00:00:00"))));
+        List.of(
+            new MortgageRate(30, 0.0, LocalDateTime.parse("2023-10-01T00:00:00")),
+            new MortgageRate(15, 2.8, LocalDateTime.parse("2023-10-01T00:00:00"))));
     service = new ProdMortgageCalculatorService(properties);
     ReflectionTestUtils.setField(service, "incomeTimeLimit", 4);
     MortgageCheckRequest request =
         new MortgageCheckRequest(
-            new BigDecimal("60000"),
-            30,
-            new BigDecimal("240000"),
-            new BigDecimal("300000"));
+            new BigDecimal("60000"), 30, new BigDecimal("240000"), new BigDecimal("300000"));
     Exception exception =
         assertThrows(
             ArithmeticException.class,
-            () -> {
-              service.checkMortgage(request);
-            });
+            () -> service.checkMortgage(request));
     assertEquals("Denominator is zero, cannot divide by zero", exception.getMessage());
   }
 
-    @Test
-    void testCheckMortgageNotFeasible() {
-        MortgageCheckRequest request =
-                new MortgageCheckRequest(
-                        new BigDecimal("60000"), 30, new BigDecimal("240000"), new BigDecimal("50000"));
-        MortgageCheckResponse response = service.checkMortgage(request);
-        assertFalse(response.feasible());
-    }
+  @Test
+  void testCheckMortgageNotFeasible() {
+    MortgageCheckRequest request =
+        new MortgageCheckRequest(
+            new BigDecimal("60000"), 30, new BigDecimal("240000"), new BigDecimal("50000"));
+    MortgageCheckResponse response = service.checkMortgage(request);
+    assertFalse(response.feasible());
+  }
 
-    @Test
-    void testCheckMortgageNotFeasible2() {
-        MortgageCheckRequest request =
-                new MortgageCheckRequest(
-                        new BigDecimal("50000"), 30, new BigDecimal("240000"), new BigDecimal("1000000"));
-        MortgageCheckResponse response = service.checkMortgage(request);
-        assertFalse(response.feasible());
-    }
+  @Test
+  void testCheckMortgageNotFeasible2() {
+    MortgageCheckRequest request =
+        new MortgageCheckRequest(
+            new BigDecimal("50000"), 30, new BigDecimal("240000"), new BigDecimal("1000000"));
+    MortgageCheckResponse response = service.checkMortgage(request);
+    assertFalse(response.feasible());
+  }
 }

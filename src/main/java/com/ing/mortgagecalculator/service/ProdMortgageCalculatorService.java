@@ -1,21 +1,25 @@
 package com.ing.mortgagecalculator.service;
 
 import com.ing.mortgagecalculator.config.MortgageRateProperties;
+import com.ing.mortgagecalculator.exception.MaturityPeriodNotFoundException;
 import com.ing.mortgagecalculator.model.MortgageCheckRequest;
 import com.ing.mortgagecalculator.model.MortgageCheckResponse;
 import com.ing.mortgagecalculator.model.MortgageRate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 @Service
 @Profile("prod")
 public class ProdMortgageCalculatorService implements MortgageCalculatorService {
+
+  private static final Logger logger = LoggerFactory.getLogger(ProdMortgageCalculatorService.class);
 
   private static final Long ONE_HUNDRED = 100L;
   private static final Integer TWELVE = 12;
@@ -45,7 +49,9 @@ public class ProdMortgageCalculatorService implements MortgageCalculatorService 
             .findFirst();
 
     if (rateOpt.isEmpty()) {
-      throw new IllegalArgumentException("Interest rate for the given maturity period not found");
+      logger.error("Interest rate for the given maturity period not found");
+      throw new MaturityPeriodNotFoundException(
+          "Interest rate for the given maturity period not found");
     }
 
     BigDecimal monthlyInterestRate =
@@ -60,6 +66,7 @@ public class ProdMortgageCalculatorService implements MortgageCalculatorService 
                 RoundingMode.HALF_UP));
 
     if (denominator.compareTo(BigDecimal.ZERO) == ZERO) {
+      logger.error("Denominator is zero, cannot divide by zero");
       throw new ArithmeticException("Denominator is zero, cannot divide by zero");
     }
 
@@ -71,7 +78,7 @@ public class ProdMortgageCalculatorService implements MortgageCalculatorService 
                     .compareTo(request.income().multiply(BigDecimal.valueOf(incomeTimeLimit)))
                 <= ZERO
             && request.loanValue().compareTo(request.homeValue()) <= ZERO;
-
+    logger.info("Mortgage check completed: feasible={}, monthlyCosts={}", feasible, monthlyCosts);
     return new MortgageCheckResponse(feasible, monthlyCosts);
   }
 }
