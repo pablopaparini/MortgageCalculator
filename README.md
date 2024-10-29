@@ -52,3 +52,24 @@ To run the tests, use the following command:
 ```sh
 ./gradlew test
 ```
+
+## Accessing the Application
+The application runs on port `8080` by default. You can access the application via the following URL:
+```
+http://localhost:8080/api{endpoint}
+```
+
+## API Endpoints
+* GET /api/interest-rates (get a list of current interest rates)
+* POST /api/mortgage-check (post the parameters to calculate for a mortgage check)
+
+### Example Request
+```json
+{
+   "loanValue": 240000,
+   "income": 60000,
+   "homeValue": 300000,
+   "maturityPeriod": 30
+}
+```
+* You can find and postman collection in the root of the project named `MortgageCalculatorService.postman_collection.json`
