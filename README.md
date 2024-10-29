@@ -56,7 +56,7 @@ To run the tests, use the following command:
 ## Accessing the Application
 The application runs on port `8080` by default. You can access the application via the following URL:
 ```
-http://localhost:8080/api{endpoint}
+http://localhost:8080/api/{endpoint}
 ```
 
 ## API Endpoints
