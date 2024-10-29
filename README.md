@@ -72,4 +72,4 @@ http://localhost:8080/api{endpoint}
    "maturityPeriod": 30
 }
 ```
-* You can find and postman collection in the root of the project named `MortgageCalculatorService.postman_collection.json`
+* You can find a postman collection in the root of the project named `MortgageCalculatorService.postman_collection.json`
